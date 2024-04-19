@@ -13,11 +13,13 @@ class_names = ['No DR', 'Mild', 'Moderate', 'Severe', 'Proliferative DR']
 
 model = None
 
+
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     storage_client = storage.Client()
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_name)
+
 
 
 def predict(request):
@@ -36,9 +38,9 @@ def predict(request):
 
     image = request.files["file"]
 
-    image = np.array(Image.open(image).convert("RGB").resize((256, 256)))
-    image = image / 255
-    img_array = tf.expand_dims(image, 0)
+    preprocessed_image = np.array(Image.open(image).convert("RGB").resize((256, 256)))
+
+    img_array = tf.expand_dims(preprocessed_image, 0)
 
     predictions = model.predict(img_array)
 
