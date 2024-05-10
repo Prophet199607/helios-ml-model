@@ -21,6 +21,12 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
     blob.download_to_filename(destination_file_name)
 
 
+def preprocess_image(uploaded_image):
+    preprocessed_image = np.array(Image.open(uploaded_image).convert("RGB").resize((224, 224)))
+    img_array = np.expand_dims(preprocessed_image, axis=0)
+    img_array = img_array / 255.0
+    return img_array
+
 
 def predict(request):
     global model
@@ -38,9 +44,7 @@ def predict(request):
 
     image = request.files["file"]
 
-    preprocessed_image = np.array(Image.open(image).convert("RGB").resize((256, 256)))
-
-    img_array = tf.expand_dims(preprocessed_image, 0)
+    img_array = preprocess_image(image)
 
     predictions = model.predict(img_array)
 
